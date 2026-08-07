@@ -1,0 +1,53 @@
+<!-- Cryptix Games -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+<div id="cryptix-root">
+  <nav class="cx-sidebar" id="cx-sidebar">
+    <svg class="cx-side-logo" viewBox="0 0 100 100" onclick="document.getElementById('cx-content-top').scrollIntoView({behavior:'smooth'})">
+      <circle cx="50" cy="50" r="48" fill="#fff"/>
+      <circle cx="36" cy="46" r="8" fill="none" stroke="#0a0a0b" stroke-width="6"/>
+      <circle cx="64" cy="46" r="8" fill="none" stroke="#0a0a0b" stroke-width="6"/>
+    </svg>
+    <div class="cx-side-item active" title="Home">🏠</div>
+    <div class="cx-side-item" title="Trending">🔥</div>
+    <div class="cx-side-item" title="New">🆕</div>
+    <div class="cx-side-item" title="Puzzle">🧩</div>
+    <div class="cx-side-item" title="Action">⚡</div>
+    <div class="cx-side-item" title="Multiplayer">🎮</div>
+    <div class="cx-side-item" title="Favorites">⭐</div>
+  </nav>
+
+  <div class="cx-main">
+    <header class="cx-topbar">
+      <div class="cx-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fff"/></svg>
+        <span class="cx-logo-text">Cryptix Games</span>
+      </div>
+      <div class="cx-search-wrap">
+        <span class="cx-search-icon">🔍</span>
+        <input id="cx-search" placeholder="Search games..." />
+      </div>
+      <div class="cx-nav" id="cx-nav"></div>
+    </header>
+
+    <div class="cx-content" id="cx-content-top">
+      <div id="cx-hero-section">
+        <div class="cx-section-head"><h2>Top Picks</h2></div>
+        <div class="cx-hero-grid" id="cx-hero-grid"></div>
+      </div>
+
+      <div class="cx-section-head">
+        <h2 id="cx-grid-title">All Games</h2>
+        <span class="cx-count" id="cx-count"></span>
+      </div>
+      <div class="cx-grid" id="cx-grid"></div>
+    </div>
+  </div>
+
+  <button class="cx-fab" id="cx-add-fab">+ Add Game</button>
+  <div id="cx-modal-zone"></div>
+  <div id="cx-player-zone"></div>
+</div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
