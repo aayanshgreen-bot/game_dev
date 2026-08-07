@@ -560,5 +560,9 @@ const DEFAULT_COVERS = [
     state.games = await loadGames();
     renderNav();
     renderAll();
+    setTimeout(() => {
+      const loader = document.getElementById('cx-loader');
+      if (loader) loader.classList.add('hidden');
+    }, 3000);
   })();
 })();

@@ -1,8 +1,23 @@
 <!-- Cryptix Games -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+<div id="cx-loader" class="cx-loader">
+  <lottie-player src="{{ url_for('static', filename='Gaming Console.json') }}" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
+</div>
 
 
 <div id="cryptix-root">
+  <div class="bg-animations">
+    <div class="cx-shape circle" style="top:20%; left:10%; width: 50px; height: 50px; background: #d946ef; animation-duration: 8s;"></div>
+    <div class="cx-shape circle-outline" style="top:70%; left:25%; width: 60px; height: 60px; animation-duration: 12s; animation-delay: 1s;"></div>
+    <div class="cx-shape cross" style="top:80%; left:70%; animation-duration: 9s;"></div>
+    <div class="cx-shape cross" style="top:15%; right:15%; animation-duration: 11s; animation-delay: 2s; transform: scale(0.7);"></div>
+    <div class="cx-shape star" style="top:40%; right:8%; animation-duration: 14s;">★</div>
+    <div class="cx-shape circle" style="bottom:10%; right:20%; width:20px; height:20px; background:#10b981; animation-duration: 7s;"></div>
+    <div class="cx-shape circle-outline" style="top:5%; left:50%; width: 30px; height: 30px; border-width: 3px; animation-duration: 15s; animation-delay: 3s;"></div>
+  </div>
+
   <nav class="cx-sidebar" id="cx-sidebar">
     <svg class="cx-side-logo" viewBox="0 0 100 100" onclick="document.getElementById('cx-content-top').scrollIntoView({behavior:'smooth'})">
       <circle cx="50" cy="50" r="48" fill="#fff"/>
