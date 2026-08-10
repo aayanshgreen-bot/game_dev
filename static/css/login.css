@@ -1,0 +1,89 @@
+/* login.css */
+.landing-container {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at center, #1c2345 0%, #0f152e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* above everything */
+    overflow: hidden;
+}
+
+.login-box {
+    position: relative;
+    width: 380px;
+    height: 440px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+/* Neon tracing effect using a spinning gradient */
+.login-box::before {
+    content: '';
+    position: absolute;
+    width: 150px;
+    height: 150%;
+    background: linear-gradient(180deg, transparent, #00ccff, #d946ef, transparent);
+    animation: animateNeon 3s linear infinite;
+}
+
+.login-box::after {
+    content: '';
+    position: absolute;
+    inset: 3px; /* inner border thickness */
+    background: #0f152e;
+    border-radius: 17px;
+}
+
+@keyframes animateNeon {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.login-inner {
+    position: absolute;
+    inset: 5px;
+    z-index: 10;
+    border-radius: 15px;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(20, 26, 56, 0.95); /* matching sidebar/surface */
+    backdrop-filter: blur(10px);
+}
+
+.login-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 30px;
+    background: linear-gradient(90deg, #10b981, #38bdf8, #d946ef);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 25px;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(255,153,0,0.4);
+    transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+    box-shadow: 0 0 25px rgba(255,153,0,0.7);
+    transform: translateY(-2px);
+}

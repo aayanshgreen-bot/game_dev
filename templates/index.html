@@ -1,11 +1,20 @@
-<!-- Cryptix Games -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptix Games</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</head>
+<body>
 
-<div id="cx-loader" class="cx-loader">
+
+
+<div id="cx-loader" class="cx-loader" style="display: none;">
   <lottie-player src="{{ url_for('static', filename='Gaming Console.json') }}" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></lottie-player>
 </div>
-
 
 <div id="cryptix-root">
   <div class="bg-animations">
@@ -18,20 +27,7 @@
     <div class="cx-shape circle-outline" style="top:5%; left:50%; width: 30px; height: 30px; border-width: 3px; animation-duration: 15s; animation-delay: 3s;"></div>
   </div>
 
-  <nav class="cx-sidebar" id="cx-sidebar">
-    <svg class="cx-side-logo" viewBox="0 0 100 100" onclick="document.getElementById('cx-content-top').scrollIntoView({behavior:'smooth'})">
-      <circle cx="50" cy="50" r="48" fill="#fff"/>
-      <circle cx="36" cy="46" r="8" fill="none" stroke="#0a0a0b" stroke-width="6"/>
-      <circle cx="64" cy="46" r="8" fill="none" stroke="#0a0a0b" stroke-width="6"/>
-    </svg>
-    <div class="cx-side-item active" title="Home">🏠</div>
-    <div class="cx-side-item" title="Trending">🔥</div>
-    <div class="cx-side-item" title="New">🆕</div>
-    <div class="cx-side-item" title="Puzzle">🧩</div>
-    <div class="cx-side-item" title="Action">⚡</div>
-    <div class="cx-side-item" title="Multiplayer">🎮</div>
-    <div class="cx-side-item" title="Favorites">⭐</div>
-  </nav>
+
 
   <div class="cx-main">
     <header class="cx-topbar">
@@ -66,3 +62,6 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>

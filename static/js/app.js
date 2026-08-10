@@ -3,7 +3,7 @@
   const MAX_HTML_CHARS = 1500000;
   const MAX_ZIP_BYTES = 3500000;
   const MAX_COVER_BYTES = 350000;
-  let state = { user: null, games: [], search: '', category: 'Home' };
+  let state = { user: localStorage.getItem('isLoggedIn') === 'true' ? (localStorage.getItem('cxUsername') || 'Player') : null, games: [], search: '', category: 'Home' };
   let jszipLoaded = false;
 
   const navEl = document.getElementById('cx-nav');
@@ -18,21 +18,21 @@
   const searchInput = document.getElementById('cx-search');
 
   async function loadUsers(){
-    try{ const r = await window.storage.get('cryptix-users', SHARED); return r ? JSON.parse(r.value) : {}; }
+    try{ const r = localStorage.getItem('cryptix-users-v2'); return r ? JSON.parse(r) : {}; }
     catch(e){ return {}; }
   }
-  async function saveUsers(u){ try{ await window.storage.set('cryptix-users', JSON.stringify(u), SHARED); }catch(e){} }
+  async function saveUsers(u){ try{ localStorage.setItem('cryptix-users-v2', JSON.stringify(u)); }catch(e){} }
   async function loadGames(){
-    try{ const r = await window.storage.get('cryptix-games', SHARED); return r ? JSON.parse(r.value) : []; }
+    try{ const r = localStorage.getItem('cryptix-games-v2'); return r ? JSON.parse(r) : []; }
     catch(e){ return []; }
   }
-  async function saveGames(g){ try{ await window.storage.set('cryptix-games', JSON.stringify(g), SHARED); }catch(e){} }
-  async function saveGameFile(id, payload){ try{ await window.storage.set('cryptix-file-'+id, JSON.stringify(payload), SHARED); }catch(e){} }
+  async function saveGames(g){ try{ localStorage.setItem('cryptix-games-v2', JSON.stringify(g)); }catch(e){} }
+  async function saveGameFile(id, payload){ try{ localStorage.setItem('cryptix-file-'+id, JSON.stringify(payload)); }catch(e){} }
   async function loadGameFile(id){
-    try{ const r = await window.storage.get('cryptix-file-'+id, SHARED); return r ? JSON.parse(r.value) : null; }
+    try{ const r = localStorage.getItem('cryptix-file-'+id); return r ? JSON.parse(r) : null; }
     catch(e){ return null; }
   }
-  async function deleteGameFile(id){ try{ await window.storage.delete('cryptix-file-'+id, SHARED); }catch(e){} }
+  async function deleteGameFile(id){ try{ localStorage.removeItem('cryptix-file-'+id); }catch(e){} }
 
   function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -74,10 +74,14 @@ const DEFAULT_COVERS = [
         <span class="cx-user-chip">Hi, <b>${escapeHtml(state.user)}</b></span>
         <button class="cx-btn" id="cx-logout">Log out</button>
       `;
-      document.getElementById('cx-logout').onclick = ()=>{ state.user=null; renderNav(); renderAll(); };
+      document.getElementById('cx-logout').onclick = ()=>{ 
+          state.user=null; 
+          localStorage.removeItem('isLoggedIn'); 
+          localStorage.removeItem('cxUsername'); 
+          location.reload(); 
+      };
     } else {
-      navEl.innerHTML = `<button class="cx-btn cx-btn-primary" id="cx-login-open">Log in</button>`;
-      document.getElementById('cx-login-open').onclick = ()=> openAuth('login');
+      navEl.innerHTML = ``;
     }
   }
 
@@ -235,30 +239,45 @@ const DEFAULT_COVERS = [
 
   function addGameModalHtml(sourceType, existing){
     const isEdit = !!existing;
-    const linkField = `<div class="cx-field" id="cx-field-link"><label>Play link (URL)</label><input id="cx-g-link" placeholder="https://..." value="${existing && existing.sourceType==='link' ? escapeHtml(existing.link) : ''}"/><p class="cx-hint">Kisi bhi type ke hosted game ko link kar sakte ho.</p></div>`;
-    const htmlField = `<div class="cx-field" id="cx-field-htmlfile"><label>HTML game file (.html)</label><input id="cx-g-htmlfile" type="file" accept=".html,.htm"/><p class="cx-hint">${isEdit && existing.sourceType==='html' ? 'Khali chodo to purani file wahi rahegi.' : 'Self-contained .html file upload karo.'}</p></div>`;
-    const zipField = `<div class="cx-field" id="cx-field-zipfile"><label>ZIP game (.zip)</label><input id="cx-g-zipfile" type="file" accept=".zip"/><p class="cx-hint">${isEdit && existing.sourceType==='zip' ? 'Khali chodo to purani file wahi rahegi.' : 'Multi-file game ZIP (index.html zaroori). Max ~3.5MB.'}</p></div>`;
+    // We force sourceType to 'link' for this new UI to match the design precisely,
+    // or just assume we only upload links in this new UI.
     return `
-      <button class="cx-close" id="cx-close">×</button>
-      <h3>${isEdit ? 'Remake / Edit game' : 'Add a game'}</h3>
-      <p class="cx-sub">${isEdit ? 'Apne game ki details update karo.' : 'Apna game library mein daalo.'}</p>
+      <div class="cx-create-header-top">
+         <h2 style="text-align: center; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500; margin-bottom: 30px;">${isEdit ? 'Edit a Game' : 'Create a Game'}</h2>
+      </div>
       <div id="cx-game-error"></div>
-      <div class="cx-type-select">
-        <div class="cx-type-opt ${sourceType==='link'?'active':''}" data-type="link">🔗 Link</div>
-        <div class="cx-type-opt ${sourceType==='html'?'active':''}" data-type="html">📄 HTML file</div>
-        <div class="cx-type-opt ${sourceType==='zip'?'active':''}" data-type="zip">🗜️ ZIP file</div>
+      <div class="cx-create-game-grid-v2">
+        <div class="cx-create-left-v2">
+            <div class="cx-field-v2">
+              <label>Game Name</label>
+              <input id="cx-g-title" value="${existing ? escapeHtml(existing.title) : ''}"/>
+            </div>
+            <div class="cx-field-v2">
+              <label>Description</label>
+              <textarea id="cx-g-desc">${existing ? escapeHtml(existing.desc) : ''}</textarea>
+            </div>
+            
+            <div class="cx-field-v2 cx-field-link-v2">
+              <label>Game Link</label>
+              <input id="cx-g-link" value="${existing && existing.sourceType==='link' ? escapeHtml(existing.link) : ''}"/>
+            </div>
+        </div>
+        
+        <div class="cx-create-right-v2">
+            <div class="cx-thumbnail-upload-v2" id="cx-thumbnail-upload" style="background-image: ${existing && existing.cover ? `url('${escapeHtml(existing.cover)}')` : 'none'};">
+              <input id="cx-g-coverfile" type="file" accept="image/*" class="cx-hidden-input" />
+              <div class="cx-thumbnail-placeholder-v2" id="cx-thumbnail-placeholder" style="display: ${existing && existing.cover ? 'none' : 'flex'};">
+                 <span>Add a Thumbnail</span>
+              </div>
+              <input type="hidden" id="cx-g-cover" value="${existing && existing.cover ? escapeHtml(existing.cover) : ''}"/>
+            </div>
+        </div>
       </div>
-      <div class="cx-field"><label>Title</label><input id="cx-g-title" placeholder="e.g. Cipher Runner" value="${existing ? escapeHtml(existing.title) : ''}"/></div>
-      <div class="cx-field"><label>Description</label><textarea id="cx-g-desc" placeholder="Game kis baare mein hai...">${existing ? escapeHtml(existing.desc) : ''}</textarea></div>
-      <div class="cx-field"><label>Cover image URL (optional)</label><input id="cx-g-cover" placeholder="https://... (khali chodo to auto banega)" value="${existing && existing.cover ? escapeHtml(existing.cover) : ''}"/></div>
-      <div class="cx-field"><label>...ya thumbnail image upload karo</label><input id="cx-g-coverfile" type="file" accept="image/*"/><p class="cx-hint">File upload karoge to ye URL field se zyada priority lega.</p></div>
-      ${sourceType==='link' ? linkField : ''}
-      ${sourceType==='html' ? htmlField : ''}
-      ${sourceType==='zip' ? zipField : ''}
-      <div class="cx-modal-actions">
-        <button class="cx-btn" id="cx-cancel" style="flex:1">Cancel</button>
-        <button class="cx-btn cx-btn-primary" id="cx-submit" style="flex:1">${isEdit ? 'Save changes' : 'Add game'}</button>
+      <div class="cx-modal-actions-v2">
+        <button class="cx-btn" id="cx-cancel">Cancel</button>
+        <button class="cx-btn cx-btn-primary" id="cx-submit">${isEdit ? 'Save changes' : 'Create Game'}</button>
       </div>
+      <button class="cx-close" id="cx-close">×</button>
     `;
   }
 
@@ -280,19 +299,23 @@ const DEFAULT_COVERS = [
     const existing = editId ? state.games.find(g=>g.id===editId) : null;
     document.getElementById('cx-close').onclick = closeModal;
     document.getElementById('cx-cancel').onclick = closeModal;
-    document.querySelectorAll('.cx-type-opt').forEach(el=>{
-      el.onclick = ()=>{
-        const t = el.dataset.type;
-        const title = document.getElementById('cx-g-title').value;
-        const desc = document.getElementById('cx-g-desc').value;
-        const cover = document.getElementById('cx-g-cover').value;
-        openModal(addGameModalHtml(t, existing));
-        wireAddGame(t, editId);
-        document.getElementById('cx-g-title').value = title;
-        document.getElementById('cx-g-desc').value = desc;
-        document.getElementById('cx-g-cover').value = cover;
-      };
-    });
+
+    const coverInput = document.getElementById('cx-g-coverfile');
+    const uploadBox = document.getElementById('cx-thumbnail-upload');
+    const placeholder = document.getElementById('cx-thumbnail-placeholder');
+    if (coverInput && uploadBox) {
+        uploadBox.onclick = () => coverInput.click();
+        coverInput.onchange = (e) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    uploadBox.style.backgroundImage = `url('${ev.target.result}')`;
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        };
+    }
 
     document.getElementById('cx-submit').onclick = async ()=>{
       const title = document.getElementById('cx-g-title').value.trim();
@@ -453,14 +476,49 @@ const DEFAULT_COVERS = [
   async function openPlayer(id){
     const game = state.games.find(g=>g.id===id);
     if(!game) return;
-    playerZone.innerHTML = `
-      <div class="cx-player-overlay" id="cx-player-overlay">
-        <div class="cx-player-bar">
-          <h4>${escapeHtml(game.title)}</h4>
-          <button class="cx-btn" id="cx-player-close">Close</button>
+    const otherGames = state.games.filter(g => g.id !== id).slice(0, 2);
+    let thumbnailsHtml = otherGames.map(g => `
+      <div class="cx-player-side-thumb" onclick="openPlayer(${g.id})">
+        <div style="width:100%;height:100%;background-image:url('${escapeHtml(g.cover)}');background-size:cover;background-position:center;background-color:#fff;display:flex;align-items:center;justify-content:center;">
+           <span style="color:#000;background:rgba(255,255,255,0.7);padding:4px 8px;font-family:'Inter', sans-serif;">Game Thumbnail</span>
         </div>
-        <div class="cx-player-body" id="cx-player-body">
-          <div class="cx-player-loading" id="cx-player-loading">Loading game...</div>
+      </div>
+    `).join('');
+    
+    if (thumbnailsHtml === '') {
+        thumbnailsHtml = `
+            <div class="cx-player-side-thumb cx-player-side-thumb-placeholder">
+               <span>Game Tumbmaill</span>
+            </div>
+            <div class="cx-player-side-thumb cx-player-side-thumb-placeholder">
+               <span>Game Tumbmaill</span>
+            </div>
+        `;
+    } else if (otherGames.length === 1) {
+         thumbnailsHtml += `
+            <div class="cx-player-side-thumb cx-player-side-thumb-placeholder">
+               <span>Game Tumbmaill</span>
+            </div>
+        `;
+    }
+
+    playerZone.innerHTML = `
+      <div class="cx-player-overlay-v2" id="cx-player-overlay">
+        <button class="cx-close-player-v2" id="cx-player-close">×</button>
+        <div class="cx-player-layout-v2">
+            <div class="cx-player-main-v2">
+                <div class="cx-player-body-v2" id="cx-player-body">
+                  <div class="cx-player-loading" id="cx-player-loading">Loading game...</div>
+                </div>
+                <div class="cx-player-bottom-bar-v2">
+                    <button class="cx-player-action-btn">👍</button>
+                    <button class="cx-player-action-btn">👎</button>
+                    <button class="cx-player-action-btn">⛶</button>
+                </div>
+            </div>
+            <div class="cx-player-side-v2">
+                ${thumbnailsHtml}
+            </div>
         </div>
       </div>
     `;
@@ -558,6 +616,8 @@ const DEFAULT_COVERS = [
 
   (async function init(){
     state.games = await loadGames();
+    
+
     renderNav();
     renderAll();
     setTimeout(() => {
